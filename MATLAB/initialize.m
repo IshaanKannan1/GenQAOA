@@ -6,4 +6,5 @@ addpath([MainWorkspaceDir, filesep, 'utils']);
 addpath([MainWorkspaceDir, filesep, 'Classical']);
 addpath(genpath([MainWorkspaceDir, filesep, 'experiments']))
 addpath(genpath([MainWorkspaceDir, filesep, 'demo']))
+addpath(genpath([MainWorkspaceDir, filesep, 'iteration']))
 set(0,'DefaultAxesFontSize',16);

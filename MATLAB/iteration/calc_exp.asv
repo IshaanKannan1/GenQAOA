@@ -1,6 +1,6 @@
 function e = calc_exp(p, params, D, sL, sR)
 %     calc_exp computes the expected energy matrix element of the evolved
-%     state for our four-driver QAOA. See report for details.
+%     state for our four-driver QAOA. See our note for details.
 %     
 %     Usage: expectation = calc_exp(p, params, D, sL, sR);
 %     
@@ -17,13 +17,19 @@ function e = calc_exp(p, params, D, sL, sR)
     A = cat(1, A, -flip(A));
     z = gen_z(p);
     hps = iterate(z, params, p, D);
-    fbar = transpose(avg_f(z, params(:, 2:end), p));
-    hl = transpose(comp_h_iterfun(z, sL, p));
-    hr = transpose(comp_h_iterfun(z, sR, p));
+    fbar = avg_f(z, params(:, 2:end), p);
+    hl = comp_h_iterfun(z, sL, p);
+    hr = comp_h_iterfun(z, sR, p);
     e = 0;
+    fprintf("start")
+    size(transpose(exp(-1i * (z(i).*z) * A)))
+    size(hps)
+    size(fbar)
+    size()
+    fprintf("end")
     for i = 1:length(z)
-        e = e + sum(hps(i) * fbar(i) * hl(i) * transpose(exp(-1i * (z(i).*z) * A)) .* ...
-            hps .* fbar .* hr);
+        e = e + sum(hps(i) * fbar(i) * hl(i) * transpose(exp(-1i * (z(i).*z) * A)) .* hps ...
+                .* fbar .* hl);
     end
 end
 

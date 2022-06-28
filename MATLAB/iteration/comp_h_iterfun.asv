@@ -1,7 +1,0 @@
-function v = comp_h_iterfun(z, sigma)
-    z1 = z(p+1);
-    z2 = z(p+2);
-    switch sigma
-        case 1
-            v = 
-end

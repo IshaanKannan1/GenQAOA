@@ -44,7 +44,7 @@ function prod = comp_f_iterfun(n, z, params, p)
     end
     z1 = z(:, 1);
     zp = z(:, 2*p+2);
-    prod = prod .* 1/4.*(1 + n(1) + n(3).*z1 + 1i*n(2).*(z1-zp) - n(1).*zp.*z1 + (n(3) + z1).*zp);
+    prod = prod .* 1/4.*(1 + n(1) + n(3).*z1 + 1i*n(2).*(z1-z2) - n(1).*zp.*z1 +(n(3) + z1).*z2);
 end
 
 function v = equal_z(b, g, d, n, pos)

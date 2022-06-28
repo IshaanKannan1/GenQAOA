@@ -46,7 +46,7 @@ for p = 1:pmax
                     psi0 = randns{i};
                 end
                 J = [wGs{i}, -ones(size(wGs{i},1))];
-                [QAOAhelperfcn, HamObj, HamC, HamZ, HamB, HamD, EvolC, EvolZ, EvolB, EvolD] = SetupQMCHams(n, J, ones(n,1), psi0, vs{i}, [orderlist(orders,:)]);
+                [QAOAhelperfcn, HamObj, HamC, HamZ, HamB, HamD, EvolC, EvolZ, EvolB, EvolD] = SetupQMCHams(n, J, ones(n,1), psi0, vs{i}, 0, [orderlist(orders,:)]);
                 for t = 1:6
                     param0 = 2*rand(p,4)-1;
                     myfun = @(param) QAOAhelperfcn(p, param);

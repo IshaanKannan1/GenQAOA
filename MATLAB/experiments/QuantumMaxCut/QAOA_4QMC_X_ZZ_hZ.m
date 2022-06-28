@@ -1,4 +1,4 @@
-
+% Needs editing for new SetupQMCHams
 TRY_RING = false;
 
 N = 10;

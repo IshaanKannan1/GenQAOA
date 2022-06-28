@@ -1,5 +1,5 @@
 function [QAOAhelperfcn, HamObj, ...
-    HamC, HamZ, HamB, HamD, EvolC, EvolZ, EvolB, EvolD] =  SetupQMCHams(N, J, h, psi0, v, varargin)
+    HamC, HamZ, HamB, HamD, EvolC, EvolZ, EvolB, EvolD] =  SetupQMCHams(N, J, h, psi0, v, oneEdge, varargin)
 %SetupQMCHams sets up the Hamiltonians and evolution functions for QAOA
 %           in one-dimension using ZZ, Z, and X-type driver to optimize the
 %           Quantum MaxCut Hamiltonian problem
@@ -34,11 +34,20 @@ sz = sparse(diag([1,-1]));
 % objective Hamiltonian
 HamObj = sparse(0);
 
-for ind = 1:size(J, 1)
-    Ia = J(ind,1);
-    Ib = J(ind, 2);
-    HamObj = HamObj + J(ind,3)/2 * (speye(2^N) - Ham2LTerm(sx, sx, Ia, Ib, N) -...
-        Ham2LTerm(sy, sy, Ia, Ib, N) - Ham2LTerm(sz, sz, Ia, Ib, N));
+% For testing iteration, only care about edge between middle vertices,
+% which will always be in the same place, (N/2)
+if oneEdge == 1
+    Ia = J(N/2, 1);
+    Ib = J(N/2, 2);
+    HamObj = HamObj + J(ceil(N/2),3)/2 * (speye(2^N) - Ham2LTerm(sx, sx, Ia, Ib, N) -...
+            Ham2LTerm(sy, sy, Ia, Ib, N) - Ham2LTerm(sz, sz, Ia, Ib, N));
+else
+    for ind = 1:size(J, 1)
+        Ia = J(ind,1);
+        Ib = J(ind, 2);
+        HamObj = HamObj + J(ind,3)/2 * (speye(2^N) - Ham2LTerm(sx, sx, Ia, Ib, N) -...
+            Ham2LTerm(sy, sy, Ia, Ib, N) - Ham2LTerm(sz, sz, Ia, Ib, N));
+    end
 end
 
 
@@ -76,7 +85,7 @@ EvolD = @(psi, delta) PauliRotations(N, delta, v, psi);
 
 % psi0 = ones(2^N,1)/sqrt(2^N);
 
-if nargin > 3
+if nargin > 6
     %varargin order: X, ZZ, Z, RP (BACD)
     x = num2cell(cell2mat(varargin));
     M = containers.Map(x, {HamB, HamC, HamZ, HamD});
@@ -85,5 +94,5 @@ if nargin > 3
     Evols = {E('1'), E('2'), E('3'), E('4')};
     QAOAhelperfcn = @(p, param) MultiQAOAGrad(p, HamObj, Hams, param, psi0, Evols);
 else 
-    QAOAhelperfcn = @(p, param) MultiQAOAGrad(p, HamObj, {HamB, HamC, HamZ, HamD}, param, psi0, {EvolB, EvolC, EvolZ, EvolD});
+    QAOAhelperfcn = @(p, param) MultiQAOAGrad(p, HamObj, {HamC, HamB, HamZ, HamD}, param, psi0, {EvolC, EvolB, EvolZ, EvolD});
 end

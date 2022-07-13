@@ -1,6 +1,6 @@
 function [edges, A] = gen_bbst(depth)
-% Tests iteration against actual QAOA result on a BBST
-% Not great code but this will only run once
+% Genereates edge list and adjacency matrix of a graph described by two
+% balanced binary trees joined at their roots, each of depth depth.
     A = zeros(2* (2^depth - 1));
     for j = 1:2^depth - 1 - 2^(depth - 1)
         A(j, 2*j:2*j+1) = 1;

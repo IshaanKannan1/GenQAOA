@@ -14,16 +14,24 @@ function prod = comp_f_iterfun(n, z, params, p)
 %         p = QAOA depth 
 %
 %         prod = f value for each bitstring, column of values
+
+    betas = params(:, 1);
+    gammas = params(:,2);
+    deltas = params(:,3);
+    cos_z = cos(betas) .* cos(gammas);
+
+    sin_z = sqrt(1-cos_z.^2);
+    m = [cos(gammas).*sin(betas), sin(betas) .* sin(gammas), ...
+         cos(betas).*sin(gammas)] ./sin_z;
+ 
+    cos_t = cos(deltas) .* cos_z - sin_z.*sin(deltas) .* (m * n.');
+    sin_t = sqrt(1-cos_t.^2);
+
+    r = (sin_z .* cos(deltas) .* m + cos_z .* sin(deltas) .* n - sin_z .* sin(deltas) ...
+        .* cross(m.', repmat(n, p, 1).').' ) ./sin_t;
+
     prod = ones(size(z, 1), 1);
     j = 1;
-    cos_z = cos(params(:, 1)) .* cos(params(:, 2));
-    m = normr([cos(params(:, 2)).*sin(params(:, 1)), sin(params(:, 1)) .* sin(params(:, 2)), ...
-         cos(params(:, 1)).*sin(params(:, 2))]);
-    sin_z = sqrt(1-cos_z.^2);
-    cos_t = cos(params(:, 3)) .* cos_z - sin_z.*sin(params(:, 3)) .* (m * n.');
-    sin_t = sqrt(1-cos_t.^2);
-    r = normr(sin_t .* cos(params(:, 3)) .* m + cos_t .* sin(params(:, 3)) .* n - sin_t .* sin(params(:, 3)) ...
-        .* cross(m, repmat(n, p, 1)));
     while j <= 2*p+1
         R = z(:, j+1);
         L = z(:, j);
@@ -65,7 +73,7 @@ function prod = comp_f_iterfun(n, z, params, p)
     end
     z1 = z(:, 1);
     zp = z(:, 2*p+2);
-    prod = prod .* 1/4.*(1 + n(1) + n(3).*z1 + 1i*n(2).*(z1-zp) - n(1).*zp.*z1 + (n(3) + z1).*zp)
+    prod = prod .* 1/4.*(1 + n(1) + n(3).*z1 + 1i*n(2).*(z1-zp) - n(1).*zp.*z1 + (n(3) + z1).*zp);
 end
 
 % 

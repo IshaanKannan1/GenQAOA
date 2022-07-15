@@ -22,7 +22,7 @@ function e = calc_exp(p, params, D, sL, sR)
     hr = transpose(comp_h_iterfun(z, sR, p));
     e = 0;
     for i = 1:length(z)
-        e = e + sum(hps(i) * fbar(i) * hl(i) * transpose(exp(-1i * (z(i).*z) * A)) .* ...
+        e = e + sum(hps(i) * fbar(i) * hl(i) * transpose(exp(-1i * (z(i, :).*z) * A)) .* ...
             hps .* fbar .* hr);
     end
 end

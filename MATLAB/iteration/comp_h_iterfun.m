@@ -17,4 +17,4 @@ function v = comp_h_iterfun(z, sigma, p)
         case 4
             v = (z1 + z2)/2;
     end
-end
+end 

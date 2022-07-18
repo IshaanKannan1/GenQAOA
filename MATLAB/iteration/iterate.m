@@ -18,7 +18,7 @@ function hp = iterate(z, params, p, D)
     hds = zeros(p, 2^(2*p+1));
     hds(1, :) = 1;
     fbar = avg_f(xs, params(:, 2:end), p);
-    for i = 2:p-1
+    for i = 2:p
          for j = 1:length(xs)
              hds(i, j) = sum(transpose(exp(-1i*(xs(j, :).*xs)*A)) .* hds(i-1, :) .* transpose(fbar)).^D;
              % hds(i, j) = (transpose(exp(-1i*(xs(j, :).*xs)*A)) .* hds(i-1, :) * fbar).^D;
@@ -30,6 +30,6 @@ function hp = iterate(z, params, p, D)
     end
     hp = zeros(1, size(z,1));
     for i = 1:length(hp)
-        hp(i) = sum(transpose(exp(-1i*(z(i, :).*xs)*A)) .* hds(p-1, :) .* transpose(fbar)).^D;
+        hp(i) = sum(transpose(exp(-1i*(z(i, :).*xs)*A)) .* hds(p, :) .* transpose(fbar)).^D;
     end
 end

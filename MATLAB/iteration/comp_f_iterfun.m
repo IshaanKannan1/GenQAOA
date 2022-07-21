@@ -7,13 +7,14 @@ function prod = comp_f_iterfun(n, z, params, p)
 %     
 %     Arguments:
 %         n = a 3x1 vector on the unit sphere
-%         z = a matrix of any number of length 2p+2 bitstring representing 
-%             our spin state basis.
+%         z = an Lx(2p+2) matrix, which each row is a length 2p+2 bitstring
+%              representing the qubit states in Z-basis.
 %         params = a px3 matrix specifying parameters beta, gamma, delta
 %                  in that order, for each depth from 1 to p
 %         p = QAOA depth 
 %
-%         prod = f value for each bitstring, column of values
+%     Returns:
+%         prod = f(z) value for the bitstring in each row, as a column vector
 
     betas = params(:, 1);
     gammas = params(:,2);
@@ -37,17 +38,20 @@ function prod = comp_f_iterfun(n, z, params, p)
         if j <= p
             R = z(:, j+1);
             L = z(:, j);
-            prod = prod .* ((cos_t(j) + 1i * sin_t(j) * r(j, 3)) * (R+1).*(L+1)/4 ...
-                          + (cos_t(j) - 1i * sin_t(j) * r(j, 3))* (1-R).*(1-L)/4 ...
-                          + ((r(j, 2) + 1i * r(j, 1)) * sin_t(j)) * (L+1).*(1-R)/4 ...
-                          + ((-r(j, 2) + 1i * r(j, 1)) * sin_t(j)) * (1-L).*(R+1)/4);
+            prod = prod .* ( (cos_t(j) + 1i * sin_t(j) * r(j, 3)) * (1+L).*(1+R)/4 ...
+                           + (cos_t(j) - 1i * sin_t(j) * r(j, 3)) * (1-L).*(1-R)/4 ...
+                           + (1i * (r(j, 1) - 1i * r(j, 2)) * sin_t(j)) * (1+L).*(1-R)/4 ...
+                           + (1i * (r(j, 1) + 1i * r(j, 2)) * sin_t(j)) * (1-L).*(1+R)/4);
+
         else
             k = 2*p+2 - j;
-            prod = prod .* ((cos_t(k) - 1i * sin_t(k) * r(k, 3)) * (R+1).*(L+1)/4 ...
-                          + (cos_t(k) + 1i * sin_t(k) * r(k, 3))* (1-R).*(1-L)/4 ...
-                          - ((r(k, 2) + 1i * r(k, 1)) * sin_t(k)) * (L+1).*(1-R)/4 ...
-                          + ((r(k, 2) - 1i * r(k, 1)) * sin_t(k)) * (1-L).*(R+1)/4);
-
+            R = z(:, j);
+            L = z(:, j+1);
+            prod = prod .* ...
+                        conj((cos_t(k) + 1i * sin_t(k) * r(k, 3)) * (1+L).*(1+R)/4 ...
+                           + (cos_t(k) - 1i * sin_t(k) * r(k, 3)) * (1-L).*(1-R)/4 ...
+                           + (1i * (r(k, 1) - 1i * r(k, 2)) * sin_t(k)) * (1+L).*(1-R)/4 ...
+                           + (1i * (r(k, 1) + 1i * r(k, 2)) * sin_t(k)) * (1-L).*(1+R)/4);
         end
     
         if j == p
@@ -57,7 +61,8 @@ function prod = comp_f_iterfun(n, z, params, p)
         end
     end
 
-    z1 = z(:, 1);
-    zp = z(:, 2*p+2);
-    prod = prod .* 1/4.*(1 + n(1) + n(3).*z1 + 1i*n(2).*(z1-zp) - n(1).*zp.*z1 + (n(3) + z1).*zp);
+    zF = z(:, 1);
+    zL = z(:, 2*p+2);
+
+    prod = prod .* ( 1+zF.*zL + n(1) * (1-zF.*zL) + n(3) * (zL+zF) + 1i*n(2) * (zF-zL) ) / 4;
 end

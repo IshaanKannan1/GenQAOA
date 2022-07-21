@@ -39,7 +39,6 @@ function prod = comp_f_iterfun(n, z, params, p)
                           - ((r(k, 2) + 1i * r(k, 1)) * sin_t(k)) * (L+1).*(1-R)/4 ...
                           + ((r(k, 2) - 1i * r(k, 1)) * sin_t(k)) * (1-L).*(R+1)/4);
         end
-
         if j == p
             j = j + 2;
         else

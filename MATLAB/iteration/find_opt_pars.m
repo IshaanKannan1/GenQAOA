@@ -1,4 +1,12 @@
 function [best_v, best_pars, best_D] = find_opt_pars(p, num_p, D)
+% Uses gradient descent on num_p randomly sampled points from a 4p-dimensional cube of side length
+% pi from -pi/2 to pi/2 to compute optimal parameters for QMC QAOA iteration for given degrees.
+% Saves resulting data in a struct file.
+% Arguments:
+%   - p: QAOA depth
+%   - num_p: Desired number of initial points
+%   - D: List of positive integers indicating degrees for which we want to optimize
+
     fname = join([fileparts(mfilename('fullpath')) strcat("/paramsearch/p:", num2str(p), ".mat")], "");
     % D = [1, 2, 3, 10, 100];
     data(num_p*length(D)) = struct();

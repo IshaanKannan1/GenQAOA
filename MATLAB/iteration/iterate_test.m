@@ -1,28 +1,41 @@
-function H_p = iterate(z, params, p, D) 
-% Computes all H_D(z) as outlined in our definition of the iteration. Returns
-% a column of the p^th one. 
-% 
-% Usage: hp = iterate(z, fbar, A, p, D)
-% 
-% Arguments: 
-%     z = array of bitstrings of length p of 1s and -1s.
-%     param = px4 matrix of parameters, where the columns are in the order
-%             of [alpha, beta, gamma, delta]
-%     p = QAOA depth
-%     D = degree - 1
-%
-% Returns:
-%     H_D^{(p)} (z) for all the z, at the parameters specified
+%% This file tests the subroutines in iterate(), used to generate H_D^(m)
+%% Setting up input of iterate()
+p = 6;
+
+params = ones(p,4);
+D = 2;
+z = 2*(de2bi(0:2^(2*p+2)-1) - 1);
+
+%%
+
+A = params(:,1);
+A = [A;0;0;-flip(A)];
+
+xs = gen_all_x(p);
+
+fbar = avg_f(xs, params(:, 2:end), p);
 
 
-    A = params(:,1);
-    A = [A;0;0;-flip(A)];
+%% old version (before 7/22/2022)
+tic;
+    hds = ones(p+1, 2^(2*p+1));
 
-    xs = gen_all_x(p);
-    fbar = avg_f(xs, params(:, 2:end), p);
+    for i = 2:p
+         for j = 1:length(xs)
+             hds(i, j) = sum(transpose(exp(-1i*(xs(j, :).*xs)*A)) .* hds(i-1, :) .* transpose(fbar)).^D;
+        end
+    end
+    H_p_old = zeros(size(z,1), 1);
+    for i = 1:length(H_p_old)
+        H_p_old(i) = sum(transpose(exp(-1i*(z(i, :).*xs)*A)) .* hds(p, :) .* transpose(fbar)).^D;
+    end
 
+toc;
 
-    batch_size = 2^p; % any choice that divides 2^(2p+1) is ok
+%% new version (after 7/22/2022)
+tic;
+
+    batch_size = 2^(p); % any choice that divides 2^(2p+1) is ok
 
     H_prev = ones(2^(2*p+1), 1);
     H_next = H_prev;
@@ -48,7 +61,6 @@ function H_p = iterate(z, params, p, D)
     Iremain = Is(end)+1:length(H_p);
     H_p(Iremain) =  ((fbar.* H_prev).' * exp(-1i*(xs.*A.') * z(Iremain, :).') ).^D;
     
-% %   Alternative option to generate H_p, may not be memory-efficient:
 %     H_p = transpose( ((fbar.* H_prev).' * exp(-1i*(xs.*A.') * z.') ).^D );
 
-end
+toc;
